@@ -340,11 +340,6 @@ export default {
         if (res.code == 1) {
           // 所有题目
           this.questionList = res.data.questionList;
-
-          this.questionList.length = 5;
-
-          console.log(this.questionList);
-
           //答题规定时间
           this.Timing = res.data.anwser_times;
           this.indexQuestion = res.data.questionList[0]; // 单选
@@ -567,7 +562,7 @@ export default {
 .home {
   background-color: #f5f5f5;
   position: relative;
-  height: 100vh;
+  min-height: 100vh;
   .bg_box {
     height: 1.8rem;
     .bg {
@@ -607,6 +602,7 @@ export default {
     background: #ffffff;
     border-radius: 0.3rem;
     box-shadow: 0rem 0.1rem 0.1rem 0rem rgb(200, 200, 200);
+    margin-bottom: 1.5rem;
     .title {
       height: 1.3rem;
       padding: 0 0.3rem;
@@ -642,6 +638,10 @@ export default {
     }
     .content {
       padding: 0.7rem 0.6rem 0.6rem 0.6rem;
+
+      .topic_content {
+        font-size: 0.45rem;
+      }
       .topic_options {
         margin-top: 0.5rem;
         .topic_options_item {
