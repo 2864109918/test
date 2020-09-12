@@ -27,6 +27,7 @@
             <p v-if="indexQuestion.typedata == 1">单选题</p>
             <p v-if="indexQuestion.typedata == 2">多选题</p>
             <p v-if="indexQuestion.typedata == 3">填空题</p>
+            <p v-if="indexQuestion.typedata == 4">分析题</p>
           </div>
 
           <div class="count ali-c">
@@ -34,6 +35,9 @@
             <span class="c">/{{questionList.length}}</span>
           </div>
         </div>
+
+
+
 
         <div class="content" v-on:click.once="startTime">
           <div class="topic_content">
@@ -119,6 +123,18 @@
               </div>
             </div>
           </div>
+
+
+
+
+
+
+
+
+
+
+
+          
 
           <div class="confirm">
             <div class="btn" v-if="answerList.length > 0 && !answerInfo" @click="confirm">确认</div>
