@@ -28,4 +28,7 @@ module.exports = {
     //             'store': '@/store',
     //             'views': '@/views',
     //             'network': '@/network',
-    //    
+    //         }
+    //     }
+    // }
+}
