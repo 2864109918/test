@@ -122,6 +122,9 @@ export default {
   font-weight: 400;
   color: rgba(192, 192, 192, 1);
   text-align: center;
+  img{
+    max-height: 100%;
+  }
 }
 .showImg {
   width: 1.6rem;

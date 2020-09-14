@@ -18,9 +18,13 @@
 
     <div class="test" v-if="questionList.length">
       <div class="title ali-c">
-        <div class="leftTitle ali-c">
+        <div class="leftTitle ali-c" v-if="indexQuestion.typedata==1">
           <img src="@/assets/b_label@2x.png" alt />
           <p>单选题</p>
+        </div>
+        <div class="leftTitle ali-c" v-if="indexQuestion.typedata==2">
+          <img src="@/assets/b_label@2x.png" alt />
+          <p>多选题</p>
         </div>
         <div class="count ali-c">
           <span class="n">{{index + 1}}</span>
@@ -38,11 +42,57 @@
           @next="nextQues"
         ></multipleChoice>
       </div>
+
+      <div v-if="indexQuestion.typedata==2">
+        <!-- 多选题  参数说明： 题目信息  答案信息(等待确认事件发生后传递)  key(必须要有kye，不然会组件复用)  确认答案事件  下一题事件 -->
+        <singleChoice
+          :testData="indexQuestion"
+          :answerInfo="answerInfo"
+          :key="indexQuestion.id"
+          @confirm="confirm"
+          @next="nextQues"
+        ></singleChoice>
+      </div>
+
+   <div v-if="indexQuestion.typedata==4">
+        <!-- 多选题  参数说明： 题目信息  答案信息(等待确认事件发生后传递)  key(必须要有kye，不然会组件复用)  确认答案事件  下一题事件 -->
+        <analysisChoice
+          :testData="indexQuestion"
+          :answerInfo="answerInfo"
+          :key="indexQuestion.id"
+          @confirm="confirm"
+          @next="nextQues"
+        ></analysisChoice>
+      </div>
+
+
+
+
+
+
+
+
+      <!-- 答错显示解析 -->
+      <div class="answer_info flexv" v-if="answerInfo.is_correct == 0">
+        <div class="title ali-c">
+          <img src="@/assets/b_label@2x.png" alt />
+          <p>答题解析</p>
+        </div>
+        <div class="right_box flexv">
+          <p
+            class="right_answer"
+            v-if="answerInfo.answ.length==1"
+          >正确答案:&nbsp;&nbsp;{{answerInfo.answ[0]}}</p>
+          <p class="right_answer" v-else>正确答案:&nbsp;&nbsp;{{answerInfo.answ.join(',')}}</p>
+          <div class="right_reason" v-html="answerInfo.analysis ||'<p>无答案解析</p>'"></div>
+        </div>
+      </div>
     </div>
 
     <tabBar class="van-hairline--top" :status="1"></tabBar>
 
     <!-- 
+
     <van-popup :close-on-click-overlay="false" v-model="applyShow">
       <div class="applyTest">
         <p>申请考试</p>
@@ -71,6 +121,10 @@ import tabBar from "@/components/tabBar/tabBar"; //底部按钮
 
 import multipleChoice from "@/components/multipleChoice/multipleChoice"; //单选题组件
 
+import singleChoice from "@/components/singleChoice/singleChoice"; //多选题组件
+
+import analysisChoice from "@/components/analysisChoice/analysisChoice"; //分析题
+
 Vue.use(Toast, Dialog, CountDown);
 export default {
   name: "home",
@@ -78,6 +132,8 @@ export default {
     navBar,
     tabBar,
     multipleChoice,
+    singleChoice,
+    analysisChoice,
     "van-count-down": CountDown,
   },
   data() {
@@ -188,7 +244,13 @@ export default {
         Toast.clear();
         if (res.code == 1) {
           // 所有题目
-          this.questionList = res.data.questionList;
+          res.data.questionList.forEach((v) => {
+            if (v.typedata == 4) {
+              this.questionList.push(v);
+            }
+          });
+
+          // this.questionList = res.data.questionList;
         } else {
           //未登录
           Toast.fail(res.msg);
@@ -221,10 +283,8 @@ export default {
     },
     // 下一题
     nextQues() {
+      this.answerInfo = {};
       this.index += 1;
-      // this.answerList = [];
-      // this.answerInfo = "";
-      // this.right_answer = "";
     },
     //提交考试
     submitTest() {
@@ -512,30 +572,11 @@ export default {
 // </div>
 </script>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <style scoped lang="less">
 .home {
   background-color: #f5f5f5;
   position: relative;
+  padding-bottom: 1.5rem;
   min-height: 100vh;
   .nav {
     position: absolute;
@@ -550,26 +591,22 @@ export default {
       color: white;
     }
   }
-
   .bg_img {
     height: 5rem;
     background: url("~@/assets/b_bg@2x.png");
     background-size: 100%;
     background-repeat: no-repeat;
   }
-
   .test {
-    position: absolute;
-    top: 3.2rem;
-    left: 0;
-    right: 0;
     width: 9rem;
     margin: 0 auto;
-    background: #ffffff;
+    margin-top: -1.75rem;
     border-radius: 0.3rem;
+    overflow: hidden;
     box-shadow: 0rem 0.1rem 0.1rem 0rem rgb(200, 200, 200);
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     .title {
+      background: #ffffff;
       height: 1.3rem;
       padding: 0 0.3rem;
       border-bottom: 0.02rem solid #eeeeee;
@@ -753,7 +790,8 @@ export default {
   // 答题解析
   .answer_info {
     width: 9rem;
-    margin: 0.3rem auto 0.2rem;
+    margin-top: 0.3rem;
+    padding: 0 0 0.5rem 0;
     background: #ffffff;
     border-radius: 0.3rem;
     box-shadow: 0rem 0.1rem 0.1rem 0rem rgb(200, 200, 200);
