@@ -1,0 +1,47 @@
+[33mcommit 0691192fbf320e49ff32a83cbb087127b6ddc5c2[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m
+Author: leeiouy <2051084187@qq.com>
+Date:   Mon Sep 14 15:34:57 2020 +0800
+
+    分析题有单选和多选，思路有问题，存档一份
+
+[33mcommit 300987418a1789786e443c089ef28d776a100475[m
+Author: leeiouy <2051084187@qq.com>
+Date:   Mon Sep 14 11:36:26 2020 +0800
+
+    将答题解析合并在组件里
+
+[33mcommit a0c30cc29b6dcf71e7020e13b758e6b1b81b0f69[m
+Author: leeiouy <2051084187@qq.com>
+Date:   Mon Sep 14 11:04:35 2020 +0800
+
+    单选题，多选题组件完成
+
+[33mcommit 9d4e75539a003b0b43ddb3ead2da72339a6f587f[m
+Author: leeiouy <2051084187@qq.com>
+Date:   Sat Sep 12 17:56:36 2020 +0800
+
+    重构题目内容,单选题组件完成一半
+
+[33mcommit 43cf87dbff7208a3c9d3209639277b5e6800948f[m
+Author: leeiouy <2051084187@qq.com>
+Date:   Sat Sep 12 15:22:07 2020 +0800
+
+    重构题目选项
+
+[33mcommit 5135fbeafb0d73bf00c57745eff7004499d6ceaf[m
+Author: leeiouy <2051084187@qq.com>
+Date:   Sat Sep 12 14:56:41 2020 +0800
+
+    修改了题目文字大小
+
+[33mcommit 712fad01c5f98d4a0d37296e3ee99a21c9b4d5af[m
+Author: leeiouy <2051084187@qq.com>
+Date:   Sat Sep 12 11:22:03 2020 +0800
+
+    2020/9/12
+
+[33mcommit 58bf08caa9ce94973e6e091243db75ab332e2f00[m
+Author: leeiouy <2051084187@qq.com>
+Date:   Sat Sep 12 11:19:24 2020 +0800
+
+    2020/9/12

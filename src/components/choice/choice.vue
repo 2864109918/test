@@ -1,8 +1,11 @@
 <template>
-  <div class="singleChoice">
-    <div class="title">
-      <p v-html="testData.title"></p>
+  <div class="choice">
+    <div class="status" v-if="analysisStatus">
+      <p v-if="testData.typedata==1">单选:</p>
+      <p v-if="testData.typedata==2">多选:</p>
     </div>
+    <div class="title" v-html="testData.title"></div>
+
     <!-- 选择时候展示 -->
     <div class="options" v-if="!complete">
       <div
@@ -52,10 +55,26 @@
       </div>
     </div>
 
-    <div class="btn ali-c">
+    <div class="btn ali-c" v-if="!analysisStatus">
       <div class="a"></div>
       <div class="confirm" v-if="select[0]&&!complete" @click="confirm">确定</div>
       <div class="confirm" v-if="complete" @click="next">下一题</div>
+    </div>
+    <!-- 题目解析 -->
+    <div class="answer_info flexv" v-if="answerInfo.is_correct == 0">
+      <div class="title ali-c">
+        <img src="@/assets/b_label@2x.png" alt />
+        <p>答题解析</p>
+      </div>
+
+      <div class="right_box flexv">
+        <p
+          class="right_answer"
+          v-if="answerInfo.answ.length==1"
+        >正确答案:&nbsp;&nbsp;{{answerInfo.answ[0]}}</p>
+        <p class="right_answer" v-else>正确答案:&nbsp;&nbsp;{{answerInfo.answ.join(',')}}</p>
+        <div class="right_reason" v-html="answerInfo.analysis ||'<p>无答案解析</p>'"></div>
+      </div>
     </div>
   </div>
 </template>
@@ -80,6 +99,16 @@ export default {
       default() {
         return {};
       },
+    },
+    //!如果处于分析题组件里面，btn是隐藏的
+    analysisStatus: {
+      type: Boolean,
+      default: false,
+    },
+    //!用于在分析题组件里传递选中值
+    choiceIndex: {
+      type: Number,
+      default: 0,
     },
   },
   computed: {
@@ -118,10 +147,12 @@ export default {
       let testType = this.testData.typedata;
       if (testType == 1) {
         this.$set(this.select, 0, v);
+        this.analysisSelect();
       } else if (testType == 2) {
         let isExist = this.select.indexOf(v);
         if (isExist == -1) {
           this.select.push(v); //不存在就push数组
+          this.analysisSelect();
         } else {
           this.select.splice(isExist, 1); //存在就删除此选项
         }
@@ -130,13 +161,13 @@ export default {
     //确定选项，触发事件
     confirm() {
       let testType = this.testData.typedata;
-
       if (testType == 1) {
         if (this.select) {
           this.$emit("confirm", this.select);
         }
       } else if (testType == 2) {
         if (this.select.length >= 2) {
+          this.select = this.select.sort(); //上传答案要按abcd排序，否则报错
           this.$emit("confirm", this.select);
         } else {
           Toast.fail("请选择多个选项！");
@@ -146,6 +177,16 @@ export default {
     next() {
       this.$emit("next");
     },
+    //!向分析题组件传递内容
+    analysisSelect() {
+      this.$emit(
+        "analysisSelect", //触发事件
+        this.testData.id, //题目id
+        this.choiceIndex, //组件index
+        this.testData.typedata, //题目type
+        this.select //已选中项目
+      );
+    },
   },
   created() {},
   mounted() {},
@@ -153,9 +194,13 @@ export default {
 </script>
 
 <style scoped lang="less">
-.singleChoice {
+.choice {
   padding: 0.3rem;
   background: #ffffff;
+  .status {
+    font-size: 0.4rem;
+    color: red;
+  }
   .title {
     font-size: 0.4rem;
     text-indent: 0.8rem;
@@ -164,7 +209,7 @@ export default {
   .options {
     margin-top: 0.5rem;
     .item {
-      width: 8.4rem;
+      // width: 8.4rem;
       min-height: 1.2rem;
       background: #fbfbfb;
       border: 0.02rem solid #e9e9e9;
@@ -194,6 +239,40 @@ export default {
       color: white;
       text-align: center;
       line-height: 0.8rem;
+    }
+  }
+}
+// 答题解析
+.answer_info {
+  margin-top: 0.3rem;
+  padding: 0 0 0.5rem 0;
+  background: #ffffff;
+
+  .title {
+    height: 1.3rem;
+    padding: 0 0.3rem;
+    border-bottom: 0.02rem solid #eee;
+    img {
+      width: 0.7rem;
+    }
+    p {
+      padding-left: 0.1rem;
+      font-size: 0.43rem;
+      font-family: PingFang SC;
+      font-weight: bold;
+      color: #343434;
+    }
+  }
+  .right_box {
+    padding: 0.3rem;
+    .right_answer {
+      font-size: 0.4rem;
+      font-family: PingFang SC;
+      font-weight: bold;
+      color: #343434;
+    }
+    .right_reason {
+      margin-top: 0.2rem;
     }
   }
 }

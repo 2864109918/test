@@ -4,7 +4,6 @@
     <navBar class="nav" :arrow="3">
       <p class="navTitle" slot="tabContent">{{navTitle}}</p>
     </navBar>
-
     <!-- <van-count-down
       v-if="time&&!complete"
       :auto-start="false"
@@ -18,13 +17,11 @@
 
     <div class="test" v-if="questionList.length">
       <div class="title ali-c">
-        <div class="leftTitle ali-c" v-if="indexQuestion.typedata==1">
+        <div class="leftTitle ali-c">
           <img src="@/assets/b_label@2x.png" alt />
-          <p>单选题</p>
-        </div>
-        <div class="leftTitle ali-c" v-if="indexQuestion.typedata==2">
-          <img src="@/assets/b_label@2x.png" alt />
-          <p>多选题</p>
+          <p v-if="indexQuestion.typedata == 1">单选题</p>
+          <p v-if="indexQuestion.typedata == 2">多选题</p>
+          <p v-if="indexQuestion.typedata == 4">分析题</p>
         </div>
         <div class="count ali-c">
           <span class="n">{{index + 1}}</span>
@@ -32,77 +29,31 @@
         </div>
       </div>
 
-      <div v-if="indexQuestion.typedata==1">
-        <!-- 单选题  参数说明： 题目信息  答案信息(等待确认事件发生后传递)  key(必须要有kye，不然会组件复用)  确认答案事件  下一题事件 -->
-        <multipleChoice
+      <!-- 题目组件参数说明： 题目信息  答案信息(等待确认事件发生后传递)  现在题目序号  key(必须要有kye，不然会组件复用)  确认答案事件  下一题事件 -->
+      <div v-if="indexQuestion.typedata==1||indexQuestion.typedata==2">
+        <choice
           :testData="indexQuestion"
           :answerInfo="answerInfo"
           :key="indexQuestion.id"
+          :testIndex="index"
           @confirm="confirm"
           @next="nextQues"
-        ></multipleChoice>
+        ></choice>
       </div>
 
-      <div v-if="indexQuestion.typedata==2">
-        <!-- 多选题  参数说明： 题目信息  答案信息(等待确认事件发生后传递)  key(必须要有kye，不然会组件复用)  确认答案事件  下一题事件 -->
-        <singleChoice
-          :testData="indexQuestion"
-          :answerInfo="answerInfo"
-          :key="indexQuestion.id"
-          @confirm="confirm"
-          @next="nextQues"
-        ></singleChoice>
-      </div>
-
-   <div v-if="indexQuestion.typedata==4">
-        <!-- 多选题  参数说明： 题目信息  答案信息(等待确认事件发生后传递)  key(必须要有kye，不然会组件复用)  确认答案事件  下一题事件 -->
+      <div v-if="indexQuestion.typedata==4">
         <analysisChoice
           :testData="indexQuestion"
           :answerInfo="answerInfo"
           :key="indexQuestion.id"
-          @confirm="confirm"
+          :testIndex="index"
+          @analysisConfirm="analysisConfirm"
           @next="nextQues"
         ></analysisChoice>
-      </div>
-
-
-
-
-
-
-
-
-      <!-- 答错显示解析 -->
-      <div class="answer_info flexv" v-if="answerInfo.is_correct == 0">
-        <div class="title ali-c">
-          <img src="@/assets/b_label@2x.png" alt />
-          <p>答题解析</p>
-        </div>
-        <div class="right_box flexv">
-          <p
-            class="right_answer"
-            v-if="answerInfo.answ.length==1"
-          >正确答案:&nbsp;&nbsp;{{answerInfo.answ[0]}}</p>
-          <p class="right_answer" v-else>正确答案:&nbsp;&nbsp;{{answerInfo.answ.join(',')}}</p>
-          <div class="right_reason" v-html="answerInfo.analysis ||'<p>无答案解析</p>'"></div>
-        </div>
       </div>
     </div>
 
     <tabBar class="van-hairline--top" :status="1"></tabBar>
-
-    <!-- 
-
-    <van-popup :close-on-click-overlay="false" v-model="applyShow">
-      <div class="applyTest">
-        <p>申请考试</p>
-        <div class="applyInput ali-c">
-          <input type="text" v-model="applyName" placeholder="请输入您的姓名" />
-          <input type="tel" v-model="applyPhone" maxlength="11" placeholder="请输入您的手机号" />
-        </div>
-        <div class="applyBtn" @click="applyTest">提交申请</div>
-      </div>
-    </van-popup>-->
   </div>
 </template>
 
@@ -119,10 +70,7 @@ import {
 import navBar from "@/components/navBar/navBar"; //顶部文字
 import tabBar from "@/components/tabBar/tabBar"; //底部按钮
 
-import multipleChoice from "@/components/multipleChoice/multipleChoice"; //单选题组件
-
-import singleChoice from "@/components/singleChoice/singleChoice"; //多选题组件
-
+import choice from "@/components/choice/choice"; //题目组件
 import analysisChoice from "@/components/analysisChoice/analysisChoice"; //分析题
 
 Vue.use(Toast, Dialog, CountDown);
@@ -131,8 +79,7 @@ export default {
   components: {
     navBar,
     tabBar,
-    multipleChoice,
-    singleChoice,
+    choice,
     analysisChoice,
     "van-count-down": CountDown,
   },
@@ -272,14 +219,39 @@ export default {
       }).then((res) => {
         Toast.clear();
         if (res.code == 1) {
+          console.log(res.data);
           //将答案信息传递给子组件
           this.answerInfo = res.data.questionSingle;
-          if (this.answerInfo.is_correct == 1) {
+          if (res.data.questionSingle.is_correct == 1) {
             //答案信息为1正确，累加分数
-            this.allScore += Number(this.indexQuestion.score);
+            this.allScore += Number(res.data.questionSingle.score);
           }
         }
       });
+    },
+    //!分析题确认答案触发事件
+    async analysisConfirm(v) {
+      let results = [];
+      this.$loading();
+      for (let i = 0; i < v.length; i++) {
+        await upAnsw({
+          question_id: v[i].id,
+          user_answ: v[i].select.join("|"),
+        }).then((res) => {
+          if (res.code == 1) {
+            console.log(v[i].id, res.data);
+            results.push(res.data.questionSingle);
+            if (res.data.questionSingle.is_correct == 1) {
+              //答案信息为1正确，累加分数
+              this.allScore += Number(res.data.questionSingle.score);
+            }
+          }
+        });
+      }
+      Toast.clear();
+
+      this.answerInfo = results;
+      console.log(results);
     },
     // 下一题
     nextQues() {
@@ -570,6 +542,18 @@ export default {
 //     <!-- <div class="result_btn">申请考试</div> -->
 //   </div>
 // </div>
+
+// <!--
+// <van-popup :close-on-click-overlay="false" v-model="applyShow">
+//   <div class="applyTest">
+//     <p>申请考试</p>
+//     <div class="applyInput ali-c">
+//       <input type="text" v-model="applyName" placeholder="请输入您的姓名" />
+//       <input type="tel" v-model="applyPhone" maxlength="11" placeholder="请输入您的手机号" />
+//     </div>
+//     <div class="applyBtn" @click="applyTest">提交申请</div>
+//   </div>
+// </van-popup>-->
 </script>
 
 <style scoped lang="less">
