@@ -52,7 +52,7 @@
     <div class="answer_info flexv" v-if="answerInfo.is_correct == 0">
       <div class="title ali-c">
         <img src="@/assets/b_label@2x.png" alt />
-        <p>答题解析</p>
+        <span class="iii">答题解析</span>
       </div>
 
       <div class="right_box flexv">
@@ -148,7 +148,6 @@ export default {
     },
     //确定选项，触发事件
     confirm() {
-
       let testType = this.testData.typedata;
       if (testType == 1) {
         if (this.select) {
@@ -163,8 +162,6 @@ export default {
           Toast.fail("请选择多个选项！");
         }
       }
-
-
     },
     next() {
       this.$emit("next");
@@ -201,13 +198,12 @@ export default {
   .options {
     margin-top: 0.5rem;
     .item {
-      // width: 8.4rem;
       min-height: 1.2rem;
       background: #fbfbfb;
       border: 0.02rem solid #e9e9e9;
       border-radius: 0.3rem;
       margin-bottom: 0.4rem;
-      padding: 0.5rem;
+      padding: 0.2rem 0.4rem;
       font-size: 0.43rem;
       font-family: PingFang SC;
       font-weight: 500;
@@ -239,15 +235,19 @@ export default {
   margin-top: 0.3rem;
   padding: 0 0 0.5rem 0;
   background: #ffffff;
+  
 
   .title {
     height: 1.3rem;
     padding: 0 0.3rem;
     border-bottom: 0.02rem solid #eee;
+    justify-items: left;
     img {
       width: 0.7rem;
     }
-    p {
+    .iii {
+      padding: 0;
+      text-indent: 0rem;
       padding-left: 0.1rem;
       font-size: 0.43rem;
       font-family: PingFang SC;
