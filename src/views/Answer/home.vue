@@ -65,7 +65,7 @@
       </div>
     </div>
 
-    <testResult v-if="Object.keys(result).length" @getStatus='getData' :result="result"></testResult>
+    <testResult v-if="Object.keys(result).length" @getStatus="getData" :result="result"></testResult>
 
     <van-popup :close-on-click-overlay="false" v-model="applyShow">
       <div class="applyTest">
@@ -421,13 +421,7 @@ export default {
   },
   created() {
     this.getData().then((status) => {
-      console.log(status);
-      if (
-        status == "need_apply" ||
-        status == "success" ||
-        status == "need_wait" ||
-        status == "can"
-      ) {
+      if (status !== "pending" && status !== "fail") {
         this.getQuestion();
       }
     });
