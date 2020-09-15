@@ -22,7 +22,6 @@
         :class="{success:answerInfo.answ.indexOf(item.option)!==-1}"
         v-for="(item, index) in testData.option"
         :key="index"
-        @click="selected(item.option)"
       >
         <img
           class="icon"
@@ -42,7 +41,6 @@
         :class="{fail:filterArray(item.option)}"
         v-for="(item, index) in testData.option"
         :key="index"
-        @click="selected(item.option)"
       >
         <img class="icon" v-if="filterArray(item.option)" src="@/assets/b_wrong@2x.png" alt />
 

@@ -189,7 +189,9 @@ export default {
 
       let param = new FormData(); //创建form对象
       param.append("image", uploadfile); //通过append向form对象添加数据
+      this.$loading()
       setImg(param).then((res) => {
+        Toast.clear()
         if (res.code == 1) {
           this.image = res.data.img;
         } else {

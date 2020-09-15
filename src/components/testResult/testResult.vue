@@ -36,12 +36,8 @@
           <p>用时</p>
         </div>
       </div>
-
       <div class="result_btn" v-if="result.is_pass==1" @click="i_know">我知道了</div>
-
       <div class="result_btn" v-if="result.is_pass==0" @click="restartTest">再考一次</div>
-
-      <!-- <div class="result_btn">申请考试</div> -->
     </div>
   </div>
 </template>
@@ -71,37 +67,10 @@ export default {
     },
     //再考一次
     restartTest() {
-      console.log(1321);
 
-        getstate({}).then((res) => {
-          if (res.code == 1) {
-            console.log(res);
-            //不可以考试
-            if (res.data.status == "need_apply") {
-              //需要申请考试
-              this.applyShow = true;
-            } else if (res.data.status == "success") {
-              //已经通过考试
-              Dialog.alert({
-                message: res.data.msg,
-              }).then(() => {
-                this.$router.replace("/profile");
-              });
-            } else if (res.data.status == "need_wait") {
-              //已申请待审核状态
-              Dialog.alert({
-                message: res.data.msg,
-              }).then(() => {
-                this.$router.replace("/profile");
-              });
-            } else if (res.data.status == "can") {
-              this.$router.go(0);
-            }
-          } else {
-            Toast(res.data.msg);
-            // this.$router.go(0)
-          }
-        });
+      this.$router.go(0)
+
+      // this.$emit('getStatus')
     },
   },
   created() {},

@@ -65,7 +65,7 @@
       </div>
     </div>
 
-    <testResult v-if="Object.keys(result).length" :result="result"></testResult>
+    <testResult v-if="Object.keys(result).length" @getStatus='getData' :result="result"></testResult>
 
     <van-popup :close-on-click-overlay="false" v-model="applyShow">
       <div class="applyTest">
@@ -172,34 +172,58 @@ export default {
   methods: {
     // 获取数据
     getData() {
-      return getstate({}).then((res) => {
+      this.$loading();
+      return getstate().then((res) => {
         if (res.code == 1) {
-          //不可以考试
+          console.log(res.data);
+          Toast.clear();
+          if (res.data.status == "pending") {
+            //账号正在审核状态
+            this.$router.replace({
+              path: "/applying",
+              query: {
+                msg: res.data.msg,
+              },
+            });
+            localStorage.clear();
+            return "pending";
+          }
+          if (res.data.status == "fail") {
+            //账号审核失败
+            this.$router.replace({
+              path: "/reviewFail",
+              query: {
+                msg: res.data.msg,
+              },
+            });
+            localStorage.clear();
+            return "fail";
+          }
           if (res.data.status == "need_apply") {
             //需要申请考试
             this.applyShow = true;
-          } else if (res.data.status == "success") {
+            return "need_apply";
+          }
+          if (res.data.status == "success") {
             //已经通过考试
             Dialog.alert({
               message: res.data.msg,
             }).then(() => {
               this.$router.replace("/profile");
             });
-          } else if (res.data.status == "need_wait") {
+            return "success";
+          }
+          if (res.data.status == "need_wait") {
             //已申请考试但在待审核状态
-
             Dialog.alert({
               message: res.data.msg,
             }).then(() => {
               this.$router.replace("/profile");
             });
-          } else if (res.data.status == "pending") {
-            //账号正在审核状态
-
-            Toast(res.data.msg);
-            setTimeout(() => {
-              this.$router.replace("/index/login");
-            }, 1500);
+            return "need_wait";
+          }
+          if (res.data.status == "can") {
+            return "can";
           }
         }
       });
@@ -210,13 +234,6 @@ export default {
       getQues().then((res) => {
         Toast.clear();
         if (res.code == 1) {
-          console.log(res);
-          // 所有题目
-          // res.data.questionList.forEach((v) => {
-          //   if (v.typedata == 2) {
-          //     this.questionList.push(v);
-          //   }
-          // });
           this.Timing = res.data.anwser_times;
           this.questionList = res.data.questionList;
         } else {
@@ -224,7 +241,6 @@ export default {
           Toast.fail(res.msg);
           setTimeout(() => {
             localStorage.clear();
-            sessionStorage.clear();
             this.$router.replace("/index/login");
           }, 1500);
         }
@@ -404,8 +420,16 @@ export default {
     },
   },
   created() {
-    this.getData().then(() => {
-      this.getQuestion();
+    this.getData().then((status) => {
+      console.log(status);
+      if (
+        status == "need_apply" ||
+        status == "success" ||
+        status == "need_wait" ||
+        status == "can"
+      ) {
+        this.getQuestion();
+      }
     });
   },
   mounted() {},

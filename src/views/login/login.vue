@@ -76,36 +76,9 @@ export default {
         Toast.clear();
         this.$tip(res.msg);
         if (res.code == 1) {
-          let status = res.data.userinfo.status; //(pending审核中) (fail审核失败) (nomal审核成功)
-          if (status == "pending") {
-            setTimeout(() => {
-              this.$router.replace({
-                path: "/applying",
-                query: {
-                  msg: res.data.userinfo.checkmemos,
-                },
-              });
-            }, 1500);
-          } else if (status == "fail") {
-            setTimeout(() => {
-              this.$router.replace({
-                path: "/reviewFail",
-                query: {
-                  msg: res.data.userinfo.checkmemos,
-                },
-              });
-            }, 1500);
-          } else if (status == "normal") {
-            //将登陆tokne保存浏览器对象
-            localStorage.setItem(
-              "userInfos",
-              JSON.stringify(res.data.userinfo)
-            );
-            localStorage.setItem("token", res.data.userinfo.token);
-            setTimeout(() => {
-              this.$router.replace("/home");
-            }, 1500);
-          }
+          localStorage.setItem("userInfos", JSON.stringify(res.data.userinfo));
+          localStorage.setItem("token", res.data.userinfo.token);
+          this.$router.replace("/home");
         }
       });
     },

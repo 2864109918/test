@@ -27,7 +27,7 @@ export default {
   props: {},
   data() {
     return {
-      msg:''
+      msg: "",
     };
   },
   watch: {},
@@ -38,7 +38,7 @@ export default {
     },
   },
   created() {
-        this.msg = this.$route.query.msg;
+    this.msg = this.$route.query.msg;
   },
   mounted() {},
 };
