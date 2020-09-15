@@ -1,9 +1,5 @@
 <template>
   <div class="choice">
-    <div class="status" v-if="analysisStatus">
-      <p v-if="testData.typedata==1">单选:</p>
-      <p v-if="testData.typedata==2">多选:</p>
-    </div>
     <div class="title" v-html="testData.title"></div>
 
     <!-- 选择时候展示 -->
@@ -53,12 +49,6 @@
         <div class="i" v-else>{{item.option}}.</div>
         <div class="content" v-html="item.option_content"></div>
       </div>
-    </div>
-
-    <div class="btn ali-c" v-if="!analysisStatus">
-      <div class="a"></div>
-      <div class="confirm" v-if="select[0]&&!complete" @click="confirm">确定</div>
-      <div class="confirm" v-if="complete" @click="next">下一题</div>
     </div>
     <!-- 题目解析 -->
     <div class="answer_info flexv" v-if="answerInfo.is_correct == 0">
@@ -160,6 +150,7 @@ export default {
     },
     //确定选项，触发事件
     confirm() {
+
       let testType = this.testData.typedata;
       if (testType == 1) {
         if (this.select) {
@@ -168,24 +159,27 @@ export default {
       } else if (testType == 2) {
         if (this.select.length >= 2) {
           this.select = this.select.sort(); //上传答案要按abcd排序，否则报错
+          console.log(this.select);
           this.$emit("confirm", this.select);
         } else {
           Toast.fail("请选择多个选项！");
         }
       }
+
+
     },
     next() {
       this.$emit("next");
     },
-    //!向分析题组件传递内容
+    //!向父组件组件（home页或分析题组件）传递内容
     analysisSelect() {
-      this.$emit(
-        "analysisSelect", //触发事件
-        this.testData.id, //题目id
-        this.choiceIndex, //组件index
-        this.testData.typedata, //题目type
-        this.select //已选中项目
-      );
+      let obj = {
+        id: this.testData.id, //题目id
+        testType: this.testData.typedata, //题目type
+        select: this.select.sort(), //已选中项目
+        choiceIndex: this.choiceIndex, //组件index
+      };
+      this.$emit("selectEvent", obj);
     },
   },
   created() {},

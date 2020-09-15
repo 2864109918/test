@@ -3,21 +3,19 @@
     <div class="title">
       <p v-html="testData.title"></p>
     </div>
-
+    <!-- <div class="status" v-if="analysisStatus">
+      <p v-if="testData.typedata==1">单选:</p>
+      <p v-if="testData.typedata==2">多选:</p>
+    </div>-->
     <div v-for="(item, index) in testData.option" :key="index">
       <choice
-        @analysisSelect="analysisSelect"
+        @selectEvent="analysisSelect"
         :testData="item"
         :answerInfo="answerInfo[index]"
         :analysisStatus="true"
         :choiceIndex="index"
         :key="item.id"
       ></choice>
-    </div>
-    <div class="btn ali-c">
-      <div class="a"></div>
-      <div class="confirm" v-if="!complete" @click="confirm">确定</div>
-      <div class="confirm" v-if="complete" @click="next">下一题</div>
     </div>
   </div>
 </template>
@@ -39,7 +37,7 @@ export default {
     },
     //子组件的答案信息，所以是数组
     answerInfo: {
-      type: [Array,Object],
+      type: [Array, Object],
       default() {
         return [];
       },
@@ -48,48 +46,21 @@ export default {
   computed: {},
   data() {
     return {
-      complete:false,
       chidrenSelect: [],
     };
   },
   watch: {
     answerInfo: {
-      handler(newVal, oldVal) {
-        this.complete = true;
-      },
+      handler(newVal, oldVal) {},
       deep: true,
     },
   },
   methods: {
-    analysisSelect(id, index, type, select) {
+    analysisSelect(obj) {
       //将子组件的状态信息保存到一个对象里
-      this.$set(this.chidrenSelect, index, {
-        id,
-        type,
-        select: select.sort(),
-      });
-    },
-    //确定选项，触发事件
-    confirm() {
-      let v = this.chidrenSelect;
-      for (let i = 0; i < v.length; i++) {
-        if (!v[i]) {
-          Toast.fail("检查未填项!");
-          return;
-        }
-        if (v[i].type == 1 && v[i].select.length == 0) {
-          Toast.fail("检查未填项!");
-          return;
-        }
-        if (v[i].type == 2 && v[i].select.length <= 1) {
-          Toast.fail("多选题至少选择两个！");
-          return;
-        }
-      }
-      this.$emit("analysisConfirm", v);
-    },
-    next() {
-      this.$emit("next");
+      let index = obj["choiceIndex"];
+      this.$set(this.chidrenSelect, index, obj);
+      this.$emit("selectEvent", this.chidrenSelect);//抛出事件给父级
     },
   },
   created() {},
