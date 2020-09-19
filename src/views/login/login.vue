@@ -73,6 +73,8 @@ export default {
         mobile: this.tel,
         password: this.psd,
       }).then((res) => {
+
+        console.log(res);
         Toast.clear();
         this.$tip(res.msg);
         if (res.code == 1) {
@@ -84,13 +86,20 @@ export default {
     },
     resetPsd() {
       this.$loading();
-      indexConfig().then((res) => {
-        Toast.clear();
-        if (res.code == 1) {
-          this.phone = res.data.data.admin_tel;
-          this.show = true;
-        }
-      });
+      indexConfig()
+        .then((res) => {
+          Toast.clear();
+          if (res.code == 1) {
+
+            
+            this.phone = res.data.data.admin_tel;
+            this.show = true;
+          }
+        })
+        .catch((err) => {
+          Toast.clear();
+          Toast.fail("网络出错！");
+        });
     },
 
     Callphone() {

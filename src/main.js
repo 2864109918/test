@@ -6,6 +6,10 @@ import {
     Toast
 } from 'vant';
 import 'lib-flexible' //网页缩放
+
+
+
+// import './utils/rem'
 import './vant/index'; //vant按需导入
 
 
@@ -33,12 +37,9 @@ Vue.prototype.$loading = msg => Toast.loading({
 router.beforeEach((to, from, next) => {
         let isLogin = localStorage.getItem('token');
         if (isLogin && to.name === 'login') { //浏览器有token并且你处于登录页，那么直接跳转home页
-
-            console.log(to.name);
             next('/home')
             return
         }
-
         next()
         if (isLogin || to.name == "registered" || to.name == 'applying' || to.name == 'reviewFail') { //没有token不允许跳转，但是可以跳转注册页 审核中页 审核失败页
             next();
