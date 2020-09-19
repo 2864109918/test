@@ -64,12 +64,17 @@ export default {
       this.$loading();
       myCenter({
         token: localStorage.getItem("user_id"),
-      }).then((res) => {
-        Toast.clear();
-        if (res.code == 1) {
-          this.profile = res.data.info;
-        }
-      });
+      })
+        .then((res) => {
+          Toast.clear();
+          if (res.code == 1) {
+            this.profile = res.data.info;
+          }
+        })
+        .catch((err) => {
+          Toast.clear();
+          Toast.fail("网络出现问题,请检查网络！");
+        });
     },
     //更换头像
     afterRead(file) {
@@ -123,9 +128,9 @@ export default {
     p {
       flex: 1;
       font-size: 0.38rem;
-    font-family: PingFang SC;
-    font-weight: 500;
-    color: #343434;
+      font-family: PingFang SC;
+      font-weight: 500;
+      color: #343434;
     }
     img {
       width: 1.47rem;

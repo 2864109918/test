@@ -231,20 +231,25 @@ export default {
     // 获取题目
     getQuestion() {
       this.$loading();
-      getQues().then((res) => {
-        Toast.clear();
-        if (res.code == 1) {
-          this.Timing = res.data.anwser_times;
-          this.questionList = res.data.questionList;
-        } else {
-          //未登录
-          Toast.fail(res.msg);
-          setTimeout(() => {
-            localStorage.clear();
-            this.$router.replace("/index/login");
-          }, 1500);
-        }
-      });
+      getQues()
+        .then((res) => {
+          Toast.clear();
+          if (res.code == 1) {
+            this.Timing = res.data.anwser_times;
+            this.questionList = res.data.questionList;
+          } else {
+            //未登录
+            Toast.fail(res.msg);
+            setTimeout(() => {
+              localStorage.clear();
+              this.$router.replace("/index/login");
+            }, 1500);
+          }
+        })
+        .catch((err) => {
+          Toast.clear();
+          Toast.fail("网络出现问题,请检查网络！");
+        });
     },
     //确定按钮
     confirm() {
@@ -294,20 +299,25 @@ export default {
       upAnsw({
         question_id: answers.id,
         user_answ: answers.select.join("|"),
-      }).then((res) => {
-        Toast.clear();
-        if (res.code == 1) {
-          //将答案信息传递给子组件
-          this.answerInfo = res.data.questionSingle;
-          this.isFinally();
-          if (res.data.questionSingle.is_correct == 1) {
-            //正确题加一
-            this.correct_number += 1;
-            //答案信息为1正确，累加分数
-            this.allScore += Number(res.data.questionSingle.score);
+      })
+        .then((res) => {
+          Toast.clear();
+          if (res.code == 1) {
+            //将答案信息传递给子组件
+            this.answerInfo = res.data.questionSingle;
+            this.isFinally();
+            if (res.data.questionSingle.is_correct == 1) {
+              //正确题加一
+              this.correct_number += 1;
+              //答案信息为1正确，累加分数
+              this.allScore += Number(res.data.questionSingle.score);
+            }
           }
-        }
-      });
+        })
+        .catch((err) => {
+          Toast.clear();
+          Toast.fail("网络出现问题,请检查网络！");
+        });
     },
     //!分析题获取答案事件
     async analysisConfirm(v) {
@@ -364,15 +374,20 @@ export default {
         start_time: this.testStartTime, //开始时间
         end_time: this.testEndTime, //结束时间
         all_number: allTestNum, //所有题数
-      }).then((res) => {
-        if (res.code == 1) {
-          console.log(res);
-          this.result = res.data.complete; //考试数据
-          this.$refs.countDown.pause(); //暂停倒计时
-          this.isTest = false; //不处于考试状态!
-          this.navTitle = "考试结果";
-        }
-      });
+      })
+        .then((res) => {
+          if (res.code == 1) {
+            console.log(res);
+            this.result = res.data.complete; //考试数据
+            this.$refs.countDown.pause(); //暂停倒计时
+            this.isTest = false; //不处于考试状态!
+            this.navTitle = "考试结果";
+          }
+        })
+        .catch((err) => {
+          Toast.clear();
+          Toast.fail("网络出现问题,请检查网络！");
+        });
     },
     //子组件抛出选中题目信息
     selectEvent(data) {
@@ -420,11 +435,16 @@ export default {
     },
   },
   created() {
-    this.getData().then((status) => {
-      if (status !== "pending" && status !== "fail") {
-        this.getQuestion();
-      }
-    });
+    this.getData()
+      .then((status) => {
+        if (status !== "pending" && status !== "fail") {
+          this.getQuestion();
+        }
+      })
+      .catch((err) => {
+        Toast.clear();
+        Toast.fail("网络出现问题,请检查网络！");
+      });
   },
   mounted() {},
   beforeRouteLeave(to, from, next) {

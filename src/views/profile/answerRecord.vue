@@ -69,13 +69,18 @@ export default {
       return answerRecord({
         page: ++this.page,
         pagesize: this.pagesize,
-      }).then((res) => {
-        Toast.clear();
-        if (res.code == 1) {
-          this.Datalist = [...this.Datalist, ...res.data.answerDetail];
-        }
-        return res.data.answerDetail.length; //返回当前获取的数据个数，如果少于pagesize就说明数据已获取最大值了
-      });
+      })
+        .then((res) => {
+          Toast.clear();
+          if (res.code == 1) {
+            this.Datalist = [...this.Datalist, ...res.data.answerDetail];
+          }
+          return res.data.answerDetail.length; //返回当前获取的数据个数，如果少于pagesize就说明数据已获取最大值了
+        })
+        .catch((err) => {
+          Toast.clear();
+          Toast.fail("网络出现问题,请检查网络！");
+        });
     },
 
     onLoad: debounce(function () {

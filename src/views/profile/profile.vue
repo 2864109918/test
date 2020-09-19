@@ -2,7 +2,7 @@
   <div class="profile">
     <div class="bg"></div>
     <div class="profileDetail ali-c jus-b">
-      <div class="avatar ali-c" >
+      <div class="avatar ali-c">
         <img v-if="profile.avatar" :src="profile.avatar" alt />
         <img v-else src="@/assets/c_head.png" alt />
       </div>
@@ -102,14 +102,18 @@ export default {
     this.$loading();
     myCenter({
       token: localStorage.getItem("user_id"),
-    }).then((res) => {
-      Toast.clear();
-
-      console.log(res);
-      if (res.code == 1) {
-        this.profile = res.data.info;
-      }
-    });
+    })
+      .then((res) => {
+        Toast.clear();
+        console.log(res);
+        if (res.code == 1) {
+          this.profile = res.data.info;
+        }
+      })
+      .catch((err) => {
+        Toast.clear();
+        Toast.fail("网络出现问题,请检查网络！");
+      });
   },
   mounted() {},
 };

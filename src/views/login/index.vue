@@ -1,7 +1,7 @@
 <template>
   <div class="login">
     <div class="title">
-      <p>南昌县公共机构节能统计员</p>
+      <p>南昌县公共机构能耗统计员</p>
       <p>上岗考试系统</p>
     </div>
     <div class="content">
