@@ -4,7 +4,7 @@
       <p class="navTitle" slot="tabContent">查看证书</p>
     </navBar>
 
-    <div id="canvas" class="content ali-c jus-c" v-if="profile.is_pass==1">
+    <div id="canvas" class="content ali-c jus-c" v-if="!fromCanvas">
       <img class="zsBG" src="@/assets/zsBG.png" alt />
 
       <div class="profile">
@@ -67,25 +67,39 @@ export default {
   data() {
     return {
       profile: {},
-      fromCanvas: "",
-      canvasImg: "",
+      fromCanvas: "", //绘制好的图片
     };
   },
   watch: {},
   computed: {
     birthday() {
-      let arr = this.profile.birthday && this.profile.birthday.split("-");
+      let arr =
+        (this.profile.birthday && this.profile.birthday.split("-")) || [];
       return (arr[0] || "0000") + "年" + (arr[1] || "00") + "月";
     },
   },
   methods: {},
   created() {
     this.$loading();
+
     myCenter()
       .then((res) => {
         Toast.clear();
         if (res.code == 1) {
           this.profile = res.data.info;
+          if (this.profile.is_pass == 1) {
+            this.$nextTick(() => {
+              setTimeout(() => {
+                new html2canvas(document.getElementById("canvas"), {
+                  useCORS: true,
+                  proxy: "https://sggsxt.0791jr.com",
+                }).then((res) => {
+                  let imgUrl = res.toDataURL();
+                  this.fromCanvas = imgUrl;
+                });
+              }, 300);
+            });
+          }
         }
       })
       .catch((err) => {
@@ -93,17 +107,7 @@ export default {
         Toast.fail("网络出现问题,请检查网络！");
       });
   },
-  mounted() {
-    setTimeout(() => {
-      new html2canvas(document.getElementById("canvas"), {
-        useCORS: true,
-        proxy: "https://sggsxt.0791jr.com",
-      }).then((res) => {
-        let imgUrl = res.toDataURL();
-        this.fromCanvas = imgUrl;
-      });
-    }, 1500);
-  },
+  mounted() {},
 };
 </script>
 
