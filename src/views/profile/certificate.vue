@@ -1,6 +1,6 @@
 <template>
   <div class="certificate">
-    <navBar :arrow="2">
+    <navBar class="van-hairline--bottom" :arrow="2">
       <p class="navTitle" slot="tabContent">查看证书</p>
     </navBar>
 

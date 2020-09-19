@@ -1,6 +1,6 @@
 <template>
   <div class="bulletinDetails">
-    <navBar class="navBg" :arrow="2">
+    <navBar class="navBg van-hairline--bottom" :arrow="2">
       <p class="navTitle" slot="tabContent">详情</p>
     </navBar>
 
