@@ -4,7 +4,7 @@
       <p class="navTitle" slot="tabContent">查看证书</p>
     </navBar>
 
-    <div id="canvas" class="content ali-c jus-c" v-if="!fromCanvas">
+    <div id="canvas" class="content ali-c jus-c" @click="getCanvas" v-if="!fromCanvas">
       <img class="zsBG" src="@/assets/zsBG.png" alt />
 
       <div class="profile">
@@ -20,15 +20,15 @@
             </div>
             <div class="companyName ali-c">
               <span class="i">单位名称</span>：
-              <span class="t">南昌嘉瑞科技发展有限公司</span>
-              <!-- <span class="t">{{profile.group_name}}</span> -->
+              <!-- <span class="t">南昌嘉瑞科技发展有限公司</span> -->
+              <span class="t">{{profile.group_name}}</span>
             </div>
           </div>
           <div class="img scale">
-            <img :src="profile.image" alt />
+            <img :src="profile.image" id="userImg" alt />
           </div>
         </div>
-        <p class="poio scale">已通过2020年度南昌县公共机构能耗统计员资格考试，特发此证。</p>
+        <div class="poio ">已通过2020年度南昌县公共机构能耗统计员资格考试，特发此证。</div>
         <div class="sumin ali-c scale">
           <div class="flex1"></div>
           <div>
@@ -39,7 +39,7 @@
       </div>
     </div>
 
-    <div v-if="fromCanvas">
+    <div class="fromCanvas" v-if="fromCanvas">
       <img :src="fromCanvas" alt />
     </div>
 
@@ -56,7 +56,7 @@ import navBar from "@/components/navBar/navBar";
 import { myCenter } from "@/request/api.js";
 import { Toast } from "vant";
 
-import html2canvas from "@/utils/html2canvas.js";
+import html2canvas from "html2canvas";
 
 export default {
   name: "",
@@ -68,6 +68,7 @@ export default {
     return {
       profile: {},
       fromCanvas: "", //绘制好的图片
+      timmer: '',
     };
   },
   watch: {},
@@ -78,27 +79,36 @@ export default {
       return (arr[0] || "0000") + "年" + (arr[1] || "00") + "月";
     },
   },
-  methods: {},
+  beforeDestroy() {
+    clearInterval(this.timmer)
+  },
+  methods: {
+    getCanvas(){
+      let a = document.getElementById("userImg");
+      this.timmer = setInterval(() =>{
+        if(a.compelete){
+          html2canvas(document.getElementById("canvas"), {
+            allowTaint: false,
+            useCORS: true,
+            async: false,
+          }).then((res) => {
+            let imgUrl = res.toDataURL();
+            this.fromCanvas = imgUrl;
+            clearInterval(this.timmer)
+          });
+        }
+      },20)
+    },
+  },
   created() {
     this.$loading();
-
+    let that = this;
     myCenter()
       .then((res) => {
         Toast.clear();
         if (res.code == 1) {
           this.profile = res.data.info;
           if (this.profile.is_pass == 1) {
-            this.$nextTick(() => {
-              setTimeout(() => {
-                new html2canvas(document.getElementById("canvas"), {
-                  useCORS: true,
-                  proxy: "https://sggsxt.0791jr.com",
-                }).then((res) => {
-                  let imgUrl = res.toDataURL();
-                  this.fromCanvas = imgUrl;
-                });
-              }, 300);
-            });
           }
         }
       })
@@ -136,7 +146,7 @@ export default {
     width: 9rem;
     .info {
       flex: 1;
-      div {
+      >div {
         padding: 0.1rem 0;
         font-size: 0.15rem;
         font-weight: 600;
@@ -163,9 +173,9 @@ export default {
   }
 
   .poio {
-    font-size: 0.3rem;
+    font-size: 0.18rem;
     line-height: 0.5rem;
-    text-align: center;
+    text-align: left;
     // padding-bottom: 1rem;
     font-weight: 600;
   }
@@ -192,6 +202,9 @@ export default {
     font-weight: 500;
     color: #9a9a9a;
   }
+}
+.fromCanvas{
+  margin-top: 1rem;
 }
 
 .scale {

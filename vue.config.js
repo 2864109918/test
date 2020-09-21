@@ -8,7 +8,7 @@ module.exports = {
         hotOnly: false,
         proxy: {
             '/api': {
-                target: 'http://sggsxt.0791jr.com', //请求地址
+                target: 'https://sggsxt.0791jr.com', //请求地址
                 ws: true,
                 changeOrigin: true,
                 pathRewrite: {
